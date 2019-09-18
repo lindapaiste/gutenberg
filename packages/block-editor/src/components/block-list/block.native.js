@@ -11,6 +11,7 @@ import {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { ToolbarButton } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
@@ -115,6 +116,7 @@ class BlockListBlock extends Component {
 			showTitle,
 			title,
 			displayToolbar,
+			parentId,
 		} = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
@@ -123,7 +125,15 @@ class BlockListBlock extends Component {
 
 		return (
 			<>
-				{ displayToolbar && <FloatingToolbar /> }
+				{ displayToolbar &&
+					<FloatingToolbar>
+						<ToolbarButton
+							title={ __( 'Navigate Up' ) }
+							onClick={ () => this.props.onSelect( parentId ) }
+							icon="arrow-up-alt"
+						/>
+					</FloatingToolbar>
+				}
 				<TouchableWithoutFeedback
 					onPress={ this.onFocus }
 					accessible={ ! isSelected }
@@ -156,6 +166,7 @@ export default compose( [
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
+			getBlockRootClientId,
 			getBlock,
 		} = select( 'core/block-editor' );
 		const order = getBlockIndex( clientId, rootClientId );
@@ -175,6 +186,8 @@ export default compose( [
 
 		const displayToolbar = isSelected && hasRootInnerBlocks;
 
+		const parentId = getBlockRootClientId( clientId );
+
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -188,6 +201,7 @@ export default compose( [
 			isValid,
 			getAccessibilityLabelExtra,
 			displayToolbar,
+			parentId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
