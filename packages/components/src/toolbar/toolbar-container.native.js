@@ -9,8 +9,8 @@ import { View } from 'react-native';
 import styles from './style.scss';
 import { withTheme } from '../mobile/dark-mode';
 
-const ToolbarContainer = ( { useStyle, passedStyle, children } ) => (
-	<View style={ [ useStyle( styles.container, styles.containerDark ), passedStyle ] }>
+const ToolbarContainer = ( { useStyle, passedStyle, children, rtl = false } ) => (
+	<View style={ [ useStyle( styles.container, styles.leftBorder, styles.containerDark ), passedStyle, rtl ? styles.rightBorder : styles.leftBorder] }>
 		{ children }
 	</View>
 );
