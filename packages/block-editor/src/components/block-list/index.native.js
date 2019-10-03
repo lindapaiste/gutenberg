@@ -10,9 +10,9 @@ import { Text, View, Platform, TouchableWithoutFeedback } from 'react-native';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { KeyboardAwareFlatList, ReadableContentView, withTheme } from '@wordpress/components';
+import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -20,6 +20,7 @@ import { KeyboardAwareFlatList, ReadableContentView, withTheme } from '@wordpres
 import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
+import FloatingToolbar from './block-mobile-floating-toolbar';
 
 const innerToolbarHeight = 44;
 
@@ -69,13 +70,15 @@ export class BlockList extends Component {
 	}
 
 	render() {
-		const { clearSelectedBlock, blockClientIds, isFullyBordered, title, header, withFooter = true, renderAppender } = this.props;
+		const { clearSelectedBlock, blockClientIds, isFullyBordered, title, header, withFooter = true, renderAppender, isFirstBlock, selectedBlockParentId } = this.props;
 
+		const showFloatingToolbar = isFirstBlock && selectedBlockParentId !== '';
 		return (
 			<View
 				style={ { flex: 1 } }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
+				{ showFloatingToolbar && <FloatingToolbar.Slot fillProps={ { innerFloatingToolbar: showFloatingToolbar } } /> }
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
@@ -93,6 +96,9 @@ export class BlockList extends Component {
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
 					ListFooterComponent={ withFooter && this.renderBlockListFooter }
+					getItemLayout={ ( data, index ) => {
+						return { length: 0, offset: 0, index };
+					} }
 				/>
 
 				{ renderAppender && blockClientIds.length > 0 &&
@@ -113,7 +119,7 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId, index } ) {
-		const blockHolderFocusedStyle = this.props.useStyle( styles.blockHolderFocused, styles.blockHolderFocusedDark );
+		const blockHolderFocusedStyle = this.props.getStylesFromColorScheme( styles.blockHolderFocused, styles.blockHolderFocusedDark );
 		const { shouldShowBlockAtIndex, shouldShowInsertionPoint } = this.props;
 		return (
 			<ReadableContentView>
@@ -133,8 +139,8 @@ export class BlockList extends Component {
 	}
 
 	renderAddBlockSeparator() {
-		const lineStyle = this.props.useStyle( styles.lineStyleAddHere, styles.lineStyleAddHereDark );
-		const labelStyle = this.props.useStyle( styles.labelStyleAddHere, styles.labelStyleAddHereDark );
+		const lineStyle = this.props.getStylesFromColorScheme( styles.lineStyleAddHere, styles.lineStyleAddHereDark );
+		const labelStyle = this.props.getStylesFromColorScheme( styles.labelStyleAddHere, styles.labelStyleAddHereDark );
 		return (
 			<View style={ styles.containerStyleAddHere } >
 				<View style={ lineStyle }></View>
@@ -166,7 +172,7 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSelectedBlock,
-			isBlockSelected,
+			getBlockRootClientId,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -183,7 +189,12 @@ export default compose( [
 			);
 		};
 
-		const selectedBlockIndex = getBlockIndex( selectedBlockClientId );
+		const selectedBlockIndex = getBlockIndex( selectedBlockClientId, rootClientId );
+
+		const isFirstBlock = selectedBlockIndex === 0;
+
+		const selectedBlockParentId = getBlockRootClientId( selectedBlockClientId );
+
 		const shouldShowBlockAtIndex = ( index ) => {
 			const shouldHideBlockAtIndex = (
 				! isSelectedGroup && blockInsertionPointIsVisible &&
@@ -202,9 +213,8 @@ export default compose( [
 			shouldShowBlockAtIndex,
 			shouldShowInsertionPoint,
 			selectedBlockClientId,
-			rootClientId,
-			getBlockIndex,
-			isBlockSelected,
+			isFirstBlock,
+			selectedBlockParentId,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -220,6 +230,5 @@ export default compose( [
 			replaceBlock,
 		};
 	} ),
-	withTheme,
+	withPreferredColorScheme,
 ] )( BlockList );
-
