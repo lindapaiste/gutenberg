@@ -16,12 +16,12 @@ function ResponsiveWrapper( { naturalWidth, naturalHeight, children } ) {
 		paddingBottom: ( naturalHeight / naturalWidth * 100 ) + '%',
 	};
 	return (
-		<div className="components-responsive-wrapper">
-			<div style={ imageStyle } />
+		<span className="components-responsive-wrapper">
+			<span style={ imageStyle } />
 			{ cloneElement( children, {
 				className: classnames( 'components-responsive-wrapper__content', children.props.className ),
 			} ) }
-		</div>
+		</span>
 	);
 }
 
