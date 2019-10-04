@@ -120,6 +120,7 @@ module.exports = {
 				'import/no-extraneous-dependencies': 'error',
 			},
 			excludedFiles: [
+				'**/{storybook,stories}\/*\.js',
 				'**/*.@(android|ios|native).js',
 				'**/@(benchmark|test|__tests__)/**/*.js',
 				'**/{storybook,stories}\/*\.js',

@@ -126,8 +126,8 @@ if ( files.length ) {
 		`${ PACKAGES_DIR }/*/src/*.scss`,
 	], {
 		ignore: [
-			`**/test/**`,
-			`**/__mocks__/**`,
+			`**/{__mocks__,__tests__,test}/**`,
+			`**/{storybook,stories}/**`,
 		],
 		onlyFiles: true,
 	} );
