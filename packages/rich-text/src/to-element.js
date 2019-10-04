@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createElement, Fragment } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -42,14 +43,46 @@ export function toElement( {
 	return createElement( Fragment, null, ...elementTree );
 }
 
+function camelCase( string ) {
+	return string
+		.toLowerCase()
+		.replace( /-([a-z])/g, ( match, $1 ) => $1.toUpperCase() );
+}
+
 function createElementTree( objects = [] ) {
 	return objects.map( ( { type, attributes, object, children, text } ) => {
 		if ( text !== undefined ) {
 			return text;
 		}
 
-		if ( attributes && 'contentEditable' in attributes ) {
-			attributes.suppressContentEditableWarning = true;
+		if ( attributes ) {
+			const { style, contentEditable } = attributes;
+
+			// Backward compatibility: adjust the style value to an object. We
+			// don't adjust any attribute keys because React will still render
+			// them correctly and log a warning.
+			if ( typeof style === 'string' ) {
+				deprecated( 'rich text format type with style attribute as CSS string', {
+					alternative: 'object with camelCased properties, consistent with the DOM style property',
+				} );
+
+				attributes.style = style.reduce( ( accumulator, piece ) => {
+					let [ key = '', value = '' ] = piece.split( ':' );
+
+					key = camelCase( key ).trim();
+					value = value.trim();
+
+					if ( key && value ) {
+						accumulator[ key ] = value;
+					}
+
+					return accumulator;
+				}, {} );
+			}
+
+			if ( contentEditable !== undefined ) {
+				attributes.suppressContentEditableWarning = true;
+			}
 		}
 
 		if ( object ) {

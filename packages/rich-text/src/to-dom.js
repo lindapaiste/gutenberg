@@ -71,6 +71,11 @@ function getNodeByPath( node, path ) {
  */
 const createEmpty = () => createElement( document, '' );
 
+const attributeMap = {
+	htmlFor: 'for',
+	className: 'class',
+};
+
 function append( element, child ) {
 	if ( typeof child === 'string' ) {
 		child = element.ownerDocument.createTextNode( child );
@@ -81,8 +86,17 @@ function append( element, child ) {
 	if ( type ) {
 		child = element.ownerDocument.createElement( type );
 
-		for ( const key in attributes ) {
-			child.setAttribute( key, attributes[ key ] );
+		for ( let key in attributes ) {
+			const value = attributes[ key ];
+
+			// Convert differently named React attributes.
+			key = attributeMap[ key ] || key;
+
+			if ( key === 'style' && value !== 'string' ) {
+				Object.assign( element.style, value );
+			}
+
+			child.setAttribute( key, value );
 		}
 	}
 
