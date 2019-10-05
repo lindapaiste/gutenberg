@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
@@ -489,6 +494,11 @@ Style.prototype.toString = function() {
 };
 Style.prototype.valueOf = Style.prototype.toString;
 
+const attributeMap = {
+	html: 'htmlFor',
+	class: 'className',
+};
+
 /**
  * Gets the attributes of an element in object shape.
  *
@@ -504,6 +514,7 @@ function getAttributes( { element } ) {
 	}
 
 	const length = element.attributes.length;
+	const prototypeKeys = Object.keys( Object.getPrototypeOf( element ) );
 	let accumulator;
 
 	// Optimise for speed.
@@ -519,7 +530,14 @@ function getAttributes( { element } ) {
 		if ( name === 'style' ) {
 			accumulator[ name ] = new Style( value, element.style );
 		} else {
-			accumulator[ name ] = value;
+			let property = attributeMap[ name ] || name;
+
+			accumulator[ property ] = value;
+			property = find( prototypeKeys, ( key ) => name === key.toLowerCase() );
+
+			if ( property ) {
+				accumulator[ property ] = element[ property ];
+			}
 		}
 	}
 
