@@ -23,6 +23,7 @@ export function toElement( {
 	value,
 	multilineTag,
 	prepareEditableTree,
+	isEditableTree,
 	placeholder,
 } ) {
 	if ( prepareEditableTree ) {
@@ -35,7 +36,7 @@ export function toElement( {
 	const tree = toObjectTree( {
 		value,
 		multilineTag,
-		isEditableTree: true,
+		isEditableTree,
 		placeholder,
 	} );
 	const elementTree = createElementTree( tree.children );

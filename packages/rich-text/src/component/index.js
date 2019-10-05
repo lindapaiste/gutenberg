@@ -806,7 +806,6 @@ class RichText extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const {
-			tagName,
 			value,
 			selectionStart,
 			selectionEnd,
@@ -816,7 +815,6 @@ class RichText extends Component {
 
 		// Check if the content changed.
 		let shouldReapply = (
-			tagName === prevProps.tagName &&
 			value !== prevProps.value &&
 			value !== this.value
 		);

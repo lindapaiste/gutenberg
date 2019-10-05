@@ -51,6 +51,7 @@ export default forwardRef( ( {
 			multilineTag={ multilineTag }
 			placeholder={ placeholder }
 			prepareEditableTree={ prepareEditableTree }
+			isEditableTree
 		/>
 	</TagName>
 ) );
