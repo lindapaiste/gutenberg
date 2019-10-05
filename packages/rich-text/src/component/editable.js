@@ -36,14 +36,15 @@ export default forwardRef( ( {
 	...remainingProps
 }, ref ) => (
 	<TagName
+		// The label is changeable.
+		aria-label={ placeholder }
+		{ ...remainingProps }
 		role="textbox"
 		aria-multiline
-		aria-label={ placeholder }
 		contentEditable
 		suppressContentEditableWarning
 		ref={ ref }
 		style={ { ...style, whiteSpace } }
-		{ ...remainingProps }
 	>
 		<Content
 			value={ value }

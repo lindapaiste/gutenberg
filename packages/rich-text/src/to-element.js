@@ -66,18 +66,20 @@ function createElementTree( objects = [] ) {
 					alternative: 'object with camelCased properties, consistent with the DOM style property',
 				} );
 
-				attributes.style = style.reduce( ( accumulator, piece ) => {
-					let [ key = '', value = '' ] = piece.split( ':' );
+				attributes.style = style
+					.split( ';' )
+					.reduce( ( accumulator, piece ) => {
+						let [ key = '', value = '' ] = piece.split( ':' );
 
-					key = camelCase( key ).trim();
-					value = value.trim();
+						key = camelCase( key ).trim();
+						value = value.trim();
 
-					if ( key && value ) {
-						accumulator[ key ] = value;
-					}
+						if ( key && value ) {
+							accumulator[ key ] = value;
+						}
 
-					return accumulator;
-				}, {} );
+						return accumulator;
+					}, {} );
 			}
 
 			if ( contentEditable !== undefined ) {

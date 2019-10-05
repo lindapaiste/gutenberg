@@ -1,18 +1,12 @@
 /**
  * WordPress dependencies
  */
-
-import {
-	escapeHTML,
-	escapeAttribute,
-	isValidAttributeName,
-} from '@wordpress/escape-html';
+import { renderToString } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-
-import { toObjectTree } from './to-object-tree';
+import { toElement } from './to-element';
 
 /**
  * Create an HTML string from a Rich Text value. If a `multilineTag` is
@@ -25,30 +19,5 @@ import { toObjectTree } from './to-object-tree';
  * @return {string} HTML string.
  */
 export function toHTMLString( { value, multilineTag } ) {
-	const tree = toObjectTree( { value, multilineTag } );
-	return createChildrenHTML( tree.children );
-}
-
-function createElementHTML( { type, attributes, object, children } ) {
-	let attributeString = '';
-
-	for ( const key in attributes ) {
-		if ( ! isValidAttributeName( key ) ) {
-			continue;
-		}
-
-		attributeString += ` ${ key }="${ escapeAttribute( attributes[ key ] ) }"`;
-	}
-
-	if ( object ) {
-		return `<${ type }${ attributeString }>`;
-	}
-
-	return `<${ type }${ attributeString }>${ createChildrenHTML( children ) }</${ type }>`;
-}
-
-function createChildrenHTML( children = [] ) {
-	return children.map( ( child ) => {
-		return child.text === undefined ? createElementHTML( child ) : escapeHTML( child.text );
-	} ).join( '' );
+	return renderToString( toElement( { value, multilineTag } ) );
 }

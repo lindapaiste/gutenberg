@@ -470,6 +470,25 @@ function createFromMultilineElement( {
 	return accumulator;
 }
 
+function Style( value, style ) {
+	Object.defineProperty( this, 'value', {
+		enumerable: false,
+		value,
+	} );
+
+	Object.keys( style ).forEach( ( key ) => {
+		if ( style[ key ] && ! /^\d+$/.test( key ) ) {
+			this[ key ] = style[ key ];
+		}
+	} );
+}
+
+Style.prototype = Object.create( String.prototype );
+Style.prototype.toString = function() {
+	return this.value;
+};
+Style.prototype.valueOf = Style.prototype.toString;
+
 /**
  * Gets the attributes of an element in object shape.
  *
@@ -496,7 +515,12 @@ function getAttributes( { element } ) {
 		}
 
 		accumulator = accumulator || {};
-		accumulator[ name ] = value;
+
+		if ( name === 'style' ) {
+			accumulator[ name ] = new Style( value, element.style );
+		} else {
+			accumulator[ name ] = value;
+		}
 	}
 
 	return accumulator;

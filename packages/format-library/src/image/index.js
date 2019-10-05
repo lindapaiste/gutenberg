@@ -35,7 +35,7 @@ export const image = {
 	tagName: 'img',
 	className: null,
 	attributes: {
-		className: 'class',
+		className: 'className',
 		style: 'style',
 		url: 'src',
 		alt: 'alt',
@@ -53,22 +53,22 @@ export const image = {
 		}
 
 		static getDerivedStateFromProps( props, state ) {
-			const { activeObjectAttributes: { style } } = props;
+			const { activeObjectAttributes: { style = {} } } = props;
 
-			if ( style === state.previousStyle ) {
+			if ( style.width === state.previousStyle ) {
 				return null;
 			}
 
-			if ( ! style ) {
+			if ( ! style.width ) {
 				return {
 					width: undefined,
-					previousStyle: style,
+					previousStyle: style.width,
 				};
 			}
 
 			return {
-				width: style.replace( /\D/g, '' ),
-				previousStyle: style,
+				width: style.width.replace( /\D/g, '' ),
+				previousStyle: style.width,
 			};
 		}
 
@@ -93,7 +93,7 @@ export const image = {
 
 		render() {
 			const { value, onChange, isObjectActive, activeObjectAttributes } = this.props;
-			const { style } = activeObjectAttributes;
+			const { style = {} } = activeObjectAttributes;
 
 			return (
 				<MediaUploadCheck>
@@ -111,7 +111,9 @@ export const image = {
 								type: name,
 								attributes: {
 									className: `wp-image-${ id }`,
-									style: `width: ${ Math.min( width, 150 ) }px;`,
+									style: {
+										width: `${ Math.min( width, 150 ) }px`,
+									},
 									url,
 									alt,
 								},
@@ -127,7 +129,7 @@ export const image = {
 						<PopoverAtImage
 							// Reposition Popover when the selection changes or
 							// when the width changes.
-							dependencies={ [ style, value.start ] }
+							dependencies={ [ style.width, value.start ] }
 						>
 							{ // Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */ }
@@ -142,7 +144,9 @@ export const image = {
 										type: name,
 										attributes: {
 											...activeObjectAttributes,
-											style: `width: ${ this.state.width }px;`,
+											style: {
+												width: `${ this.state.width }px`,
+											},
 										},
 									};
 

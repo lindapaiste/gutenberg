@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 
@@ -92,11 +98,17 @@ function append( element, child ) {
 			// Convert differently named React attributes.
 			key = attributeMap[ key ] || key;
 
-			if ( key === 'style' && value !== 'string' ) {
-				Object.assign( element.style, value );
-			}
+			if ( key === 'style' && typeof value !== 'string' ) {
+				Object.assign( child.style, value );
+			} else {
+				if ( key === 'style' ) {
+					deprecated( 'rich text format type with style attribute as CSS string', {
+						alternative: 'object with camelCased properties, consistent with the DOM style property',
+					} );
+				}
 
-			child.setAttribute( key, value );
+				child.setAttribute( key, value );
+			}
 		}
 	}
 
